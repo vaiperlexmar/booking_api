@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: booking_api_db
+        volumes:
+            - ./storage/mysql:/var/lib/mysql:rw
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "3406:3306"
+        user: mysql
+
