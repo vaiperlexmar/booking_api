@@ -12,28 +12,51 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function index()
+    public function register_form(Request $request)
     {
         return view('auth.register');
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $validateData = $request->validate([
+        $credentials = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $validateData['name'],
-            'email' => $validateData['email'],
-            'password' => Hash::make($validateData['password']),
+            'name' => $credentials['name'],
+            'email' => $credentials['email'],
+            'password' => Hash::make($credentials['password']),
         ]);
 
         Auth::login($user);
 
         return redirect("/")->with('success', 'Registration Successful!');
+    }
+
+    public function login_form()
+    {
+        return view('auth.login');
+    }
+
+    public function login(Request $request): RedirectResponse
+    {
+        $credentials = $request->validate([
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            return redirect()->intended('/');
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
     public function logout(Request $request): RedirectResponse
@@ -44,6 +67,6 @@ class AuthController extends Controller
 
         request()->session()->regenerateToken();
 
-        return redirect('/register')->with('success', 'Logout Successful!');
+        return redirect('/login')->with('success', 'Logout Successful!');
     }
 }
