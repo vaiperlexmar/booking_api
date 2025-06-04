@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class RegisterController extends Controller
         return view('auth.register');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validateData = $request->validate([
             'name' => 'required|string|max:255',
@@ -33,5 +34,16 @@ class RegisterController extends Controller
         Auth::login($user);
 
         return redirect("/")->with('success', 'Registration Successful!');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::logout();
+
+        request()->session()->invalidate();
+
+        request()->session()->regenerateToken();
+
+        return redirect('/register')->with('success', 'Logout Successful!');
     }
 }

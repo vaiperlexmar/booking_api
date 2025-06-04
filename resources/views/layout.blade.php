@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="{{ mix('resources/css/app.css') }}">
 </head>
 <body>
+<header>
+    @yield('header')
+</header>
 <main class="flex justify-center items-center">
     @yield('content')
 </main>
