@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 
-class RegisterController extends Controller
+class AuthController extends Controller
 {
     public function index()
     {
