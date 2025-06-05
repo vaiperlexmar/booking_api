@@ -30,6 +30,9 @@
 
             <label for="psw-repeat"><b>Repeat Password</b></label>
             <input type="password" placeholder="Repeat Password" name="password_confirmation" id="psw-repeat" required>
+
+
+            <input type="hidden" name="hidden_field" value="">
             <hr>
 
             <p>By creating an account you agree to our <a class="underline text-green-800" href="#">Terms & Privacy</a>.
