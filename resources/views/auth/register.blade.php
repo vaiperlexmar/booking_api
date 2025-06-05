@@ -15,8 +15,9 @@
                         @endforeach
                     </ul>
                 </div>
+
+                <hr class="mb-4">
             @endif
-            <hr class="mb-4">
 
             <label for="name"><b>Type your username</b></label>
             <input type="text" placeholder="Enter Username" name="name" id="name" required>

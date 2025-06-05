@@ -12,11 +12,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function register_form(Request $request)
-    {
-        return view('auth.register');
-    }
-
     public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -34,11 +29,6 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect("/")->with('success', 'Registration Successful!');
-    }
-
-    public function login_form()
-    {
-        return view('auth.login');
     }
 
     public function login(Request $request): RedirectResponse

@@ -7,8 +7,17 @@ Route::get('/', function () {
     return view('home');
 })->middleware('auth');
 
-Route::get('/register', [AuthController::class, 'register_form'])->name('register')->middleware('guest');
-Route::get('/login', [AuthController::class, 'login_form'])->name('login')->middleware('guest');
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register')->middleware('guest');
+
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login')->middleware('guest');
+
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request')->middleware('guest');
 
 
 Route::post('api/v1/auth/register', [AuthController::class, 'store'])->name('api.v1.register');
