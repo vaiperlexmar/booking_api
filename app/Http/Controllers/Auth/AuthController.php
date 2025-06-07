@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
@@ -28,6 +29,8 @@ class AuthController extends Controller
             'email' => $credentials['email'],
             'password' => Hash::make($credentials['password']),
         ]);
+
+        event(new Registered($user));
 
         Auth::login($user);
 
