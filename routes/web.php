@@ -1,37 +1,36 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-})->middleware(['auth', 'verified'])->name('home');
+// Главная страница
+Route::get('/', [HomeController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('home');
 
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+Route::middleware('auth')->group(function () {
+    // Профиль
+    Route::get('/profile', function () {
+    })->middleware(['auth', 'verified'])->name('profile');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
+    // Группировка верификации email
+    Route::name('verification.')->group(function () {
+        Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
+            ->name('notice');
+        Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+            ->middleware('signed')
+            ->name('verify');
+        Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])
+            ->middleware('throttle:6,1')
+            ->name('send');
+    });
+});
 
-    return redirect('/');
-})->middleware(['auth', 'signed'])->name('verification.verify');
 
-Route::post('email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-Route::get('/profile', function () {
-})->middleware(['auth', 'verified'])->name('profile');
-
-Route::post('api/v1/auth/register', [AuthController::class, 'store'])->name('api.v1.register');
-Route::post('api/v1/auth/login', [AuthController::class, 'login'])->name('api.v1.login');
-Route::post('api/v1/auth/logout', [AuthController::class, 'logout'])->name('api.v1.logout');
-
+// Группировка гостевых
 Route::middleware('guest')->group(function () {
     Route::get('/register', function () {
         return view('auth.register');
@@ -48,7 +47,23 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-password/{token}', function (string $token) {
         return view('auth.reset-password', ['token' => $token]);
     })->name('password.reset');
+});
 
-    Route::post('api/v1/auth/forgot-password', [AuthController::class, 'forgot_password'])->name('api.v1.forgot_password');
-    Route::post('api/v1/auth/reset-password', [AuthController::class, 'reset_password'])->name('api.v1.reset_password');
+Route::prefix('api/v1')->name('api.v1.')->group(function () {
+    // Публичные API
+    Route::post('auth/register', [AuthController::class, 'store'])
+        ->name('register');
+    Route::post('auth/login', [AuthController::class, 'login'])
+        ->name('login');
+
+    // API для сброса пароля
+    Route::post('auth/forgot-password', [AuthController::class, 'forgot_password'])
+        ->name('forgot_password');
+    Route::post('auth/reset-password', [AuthController::class, 'reset_password'])
+        ->name('reset_password');
+
+    // Защищенные API
+    Route::post('auth/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+
 });
